@@ -1,0 +1,28 @@
+snippet crt_clk "create_clock"
+create_clock -name $1 -period $2 -waveform {$3} [get_ports $4]
+endsnippet
+
+snippet crt_clk_v "create_clock"
+create_clock -name $1 -period $2 -waveform {$3} 
+endsnippet
+
+snippet crt_gen_clk "create_generated_clock"
+create_generated_clock -name $1 -source $2 -master_clock $3 -edge {$4} [get_pins $5] 
+endsnippet
+
+snippet sdc_tem "sdc template"
+# create clocks
+# cteate_clock BNF
+# create_clock -name clk_name -period period_value -waveform {M N} [get_ports port_name] -add -comment
+# M posedge time; N negedge time
+
+
+# create generate clocks
+# create_generated_clock BNF
+# create_generated_clock -name clk_name -source clock_source_pin -master_clock master_clock_name -edge {M N O} -edge_shift {P Q R} [get_pins pins_name] -combinational -add -comment
+
+
+# set_clock_groups BNF
+# set_clock_groups -name group_name -group clock_list -logically_exclusive -physically_exclusive -asynchronous -allow_paths -comments
+
+endsnippet
