@@ -1,0 +1,16 @@
+snippet com_init "compile initial"
+all:clean com run verdi
+
+com:
+	vcs -full64 -debug_acc+all -debug_region+cell+encrypt  -fsdb -sverilog -f $1.f -top $2 
+
+run:
+	./simv -l run.log 
+
+verdi:
+	verdi -nologo -f $1.f -top $2 &
+
+clean:
+	rm -rf AN.DB DVEfiles csrc simv simv.* *.simv inter.vpd ucli.key ucli.key *_log novas* *fsdb *.log verdiLog
+
+endsnippet

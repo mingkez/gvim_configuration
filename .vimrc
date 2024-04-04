@@ -1,109 +1,43 @@
-" Vim with all enhancements
-source $VIMRUNTIME/vimrc_example.vim
-
-" Use the internal diff if available.
-" Otherwise use the special 'diffexpr' for Windows.
-if &diffopt !~# 'internal'
-  set diffexpr=MyDiff()
-endif
-function MyDiff()
-  let opt = '-a --binary '
-  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-  let arg1 = v:fname_in
-  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-  let arg1 = substitute(arg1, '!', '\!', 'g')
-  let arg2 = v:fname_new
-  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-  let arg2 = substitute(arg2, '!', '\!', 'g')
-  let arg3 = v:fname_out
-  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-  let arg3 = substitute(arg3, '!', '\!', 'g')
-  if $VIMRUNTIME =~ ' '
-    if &sh =~ '\<cmd'
-      if empty(&shellxquote)
-        let l:shxq_sav = ''
-        set shellxquote&
-      endif
-      let cmd = '"' . $VIMRUNTIME . '\diff"'
-    else
-      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-    endif
-  else
-    let cmd = $VIMRUNTIME . '\diff'
-  endif
-  let cmd = substitute(cmd, '!', '\!', 'g')
-  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
-  if exists('l:shxq_sav')
-    let &shellxquote=l:shxq_sav
-  endif
-endfunction
-
 "-----------------------------------------------------------------------------
 " base
 "-----------------------------------------------------------------------------
-" 语法高亮度显示
 syntax on
+autocmd FileType make set noexpandtab
 set hlsearch
-au BufRead,BufNewfile *.sv set filetype=systemverilog
-filetype on                  
 set cuc
 set cul
-" 设置行号
 set nu
-set noundofile
-set nobackup
 let mapleader = ","
-
-"防止中文注释乱码
 set fileencoding=utf-8
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936,big－5                    
 set enc=utf-8
 let &termencoding=&encoding
-
-" 设置tab4个空格
 set tabstop=2
 set expandtab
-
-"程序自动缩进时候空格数
 set shiftwidth=2
-
-"退格键一次删除4个空格
 set softtabstop=2
-autocmd FileType make set noexpandtab
-
-" 在编辑过程中，在右下角显示光标位置的状态行
 set ruler
-
-" vim使用自动对起，也就是把当前行的对起格式应用到下一行
-set autoindent
-
-" 在状态列显示目前所执行的指令
+""set autoindent
+""set smartindent
 set showcmd
 set autochdir "NERDTree dir set
-" 设置颜色主题
+set guioptions+=b
+set nowrap
 colorscheme desert
-set guifont=Consolas:h14
 set nocompatible
 set backspace=indent,eol,start
-
-set nocompatible              " 去除VI一致性,必须
-" filetype off                  " 必须
+""set nocompatible
 
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
-
 
 "-----------------------------------------------------------------------------
 "  vundle
 "-----------------------------------------------------------------------------
-" 设置包括vundle和初始化相关的runtime path
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" 另一种选择, 指定一个vundle安装插件的路径
 "call vundle#begin('~/some/path/here')
 
-" 让vundle管理插件版本,必须
 Plugin 'git://github.com/VundleVim/Vundle.vim'
 Plugin 'git://github.com/scrooloose/nerdtree.git'
 "Plugin 'git://github.com/w0rp/ale.git'
@@ -114,15 +48,10 @@ Plugin 'git://github.com/Shougo/neocomplcache.vim'
 Plugin 'git://github.com/junegunn/vim-easy-align'
 Plugin 'git://github.com/scrooloose/nerdcommenter'
 Plugin 'derekwyatt/vim-scala'
-Plugin 'vhda/verilog_systemverilog.vim'
-" 你的所有插件需要在下面这行之前
-call vundle#end()            " 必须
-filetype plugin on    " 必须 加载vim自带和插件相应的语法和文件类型相关脚本
-filetype plugin indent on    " 必须 加载vim自带和插件相应的语法和文件类型相关脚本
+"Plugin 'vhda/verilog_systemverilog.vim'
+call vundle#end()            
+filetype plugin indent on 
 
-" =============================================================
-"                        成对标签设置
-" =============================================================
 source $VIMRUNTIME/macros/matchit.vim
 
 let b:match_ignorecase=0
@@ -155,32 +84,19 @@ let b:match_words=
 :inoremap [ []<ESC>i
 :inoremap { {}<ESC>i
 :inoremap " ""<ESC>i
+:inoremap ' ''<ESC>i
 
 "-----------------------------------------------------------------------------
 " NERDTree
 "-----------------------------------------------------------------------------
 map <leader>ne :NERDTreeToggle<CR>
-" 目录树窗口尺寸
 let g:NERDTreeWinSize = 25
-" 关闭nerd帮助
-" let g:NERDTreeMinimalUI = 1
-" 忽略以下文件的显示
 let NERDTreeIgnore=['\.pyc','\~$','\.swp']
-" 显示书签列表
 let NERDTreeShowBookmarks=1
-" 显示隐藏文件
 let NERDTreeShowHidden=1
-" 修改默认箭头符号
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 augroup NERDTree
-    "au!
-    "autocmd vimenter * NERDTree     " vim启动时自动打开NERDTree
-    " vim启动打开目录时自动打开NERDTree
-    "autocmd StdinReadPre * let s:std_in=1
-    "autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
-    "autocmd vimenter * NERDTreeFind 
-    " 文件全部关闭时退出NERDTree
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
 
@@ -220,17 +136,19 @@ autocmd VimEnter * wincmd w
 "-----------------------------------------------------------------------------
 "snippet.vim
 "-----------------------------------------------------------------------------
+"let g:UltiSnipsSnippetDirectories=["UltiSnips","mysnippets"]
+"let g:UltiSnipsSnippetsDir = '~/.vim/mysnippets'
 let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsListSnippets = "<c-tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
-
+""autocmd FileType v UltiSnipsAddFiletypes verilog
 
 "-----------------------------------------------------------------------------
 " neocomplcache
 "-----------------------------------------------------------------------------
-let g:neocomplcache_enable_auto_select = 1 "作用：提示的时候默认选择地一个，如果你设置为0，每次输入都需要用上下键选择
+let g:neocomplcache_enable_auto_select = 1 
 let g:neocomplcache_disable_auto_complete = 1
 "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
 " Disable AutoComplPop.
@@ -332,19 +250,16 @@ xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
-
 "-----------------------------------------------------------------------------
 " verilog_inst_gen
 "-----------------------------------------------------------------------------
 "so ~/.vim/bundle/vlog_inst_gen.vim
 "let g:vlog_inst_gen_mode=2 "copy to clipboard and echo inst in split window
 
-
 "-----------------------------------------------------------------------------
 "vtag
 "-----------------------------------------------------------------------------
 "source /home/eda/vtags-3.01/vtags_vim_api.vim
-
 
 "-----------------------------------------------------------------------------
 "nerdcommenter
@@ -352,10 +267,10 @@ nmap ga <Plug>(EasyAlign)
 let mapleader = ","
 let g:NERDSpaceDelims=1
 
-" verilog_systemverilog
-let g:verilog_syntax_fold_lst = "all"
-set foldmethod=syntax
-autocmd BufNewFile,BufRead *.snippets set ft=snippets
+au BufRead,BufNewFile Makefile,makefile set filetype=makefile
+au BufRead,BufNewFile *.sv,*.v set filetype=systemverilog
+au BufRead,BufNewFile *.snippets set filetype=snippets
+
 "-----------------------------------------------------------------------------
 " Add File Header
 "-----------------------------------------------------------------------------
@@ -420,12 +335,4 @@ function UpdateLastModifyTime()
 		call setline(8,"// Last Modified : " . strftime("%Y-%m-%d %H:%M"))
 	endif
 endfunction 
-
-
-:ab uivs localparam CLK_VALUE = 100;<Enter>initial begin<Enter>clk_i   = 0;<Enter>rst_n_i = 0;<Enter>#10;<Enter>rst_n_i = 1;<Enter>end<Enter>always #CLK_VALUE clk_i = ~clk_i;<Enter>
-
-:ab makefile all:clean elab run verdi<Enter><Enter>elab:<Enter>vcs -full64 -LDFLAGS -Wl,-no-as-needed -nc -l comp_log +v2k \<Enter>-sverilog ../rtl/*.v \<Enter>-sverilog ../tb/*.v \<Enter>-P /opt/verdi/share/PLI/VCS/linux64/novas.tab \<Enter>/opt/verdi/share/PLI/VCS/linux64/pli.a<Enter><Enter>run:<Enter>./simv -l run.log<Enter><Enter>verdi:<Enter>verdi -nologo ../rtl/*.v ../tb/*.v -ssf ./novas.fsdb<Enter><Enter>clean:<Enter>rm -rf AN.DB DVEfiles csrc simv.* *.simv inter.vpd ucli.key ucli.key *_log novas* *fsdb<Enter>
-
-:ab fsdb initial begin<Enter>$fsdbDumpfile("novas.fsdb");<Enter>$fsdbDumpvars;<Enter>$display("Goodjob!!\n");<Enter>end
-
 
