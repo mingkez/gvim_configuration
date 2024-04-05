@@ -103,4 +103,58 @@ ${1:function} () {
 }
 endsnippet
 
+snippet prj_init "generate project"
+#! /bin/bash
+
+ROOT_DIR=$(cd $(dirname \$0); pwd) # get project root direction
+mkdir -p $ROOT_DIR/hw/rtl/
+mkdir -p $ROOT_DIR/hw/sim/
+mkdir -p $ROOT_DIR/hw/filelist/
+mkdir -p $ROOT_DIR/veri/
+mkdir -p $ROOT_DIR/sim/
+touch $ROOT_DIR/hw/filelist/filelist_config
+touch $ROOT_DIR/hw/filelist/filelist_gen.sh
+touch $ROOT_DIR/sim/Makefile
+touch $ROOT_DIR/Makefile
+
+cat > $ROOT_DIR/hw/filelist/filelist_gen.sh << 'EOF'
+#! /bin/bash
+############ print info success  ##########
+function info_success(){
+  echo "Generated successfully!" 
+}
+############ print info success  ##########
+SCRIPT_DIR=$(cd $(dirname \$0); pwd) # get script direction
+
+############ generate filelist ###########
+cd $SCRIPT_DIR/../rtl/
+grep -v '#' $SCRIPT_DIR/filelist_config > $SCRIPT_DIR/rtl.f
+find $(pwd) -name "*.sv" -o -name "*.v" >> $SCRIPT_DIR/rtl.f
+
+cd $SCRIPT_DIR/../sim/
+grep -v '#' $SCRIPT_DIR/filelist_config > $SCRIPT_DIR/sim.f
+find $(pwd) -name "*.sv" -o -name "*.v" >> $SCRIPT_DIR/sim.f
+############ generate filelist ###########
+
+info_success
+
+EOF
+
+cat << EOF >  $ROOT_DIR/hw/filelist/filelist_config
+#+include+define_name
+#incdir+include_dir
+EOF
+
+cat > $ROOT_DIR/Makefile <<- 'EOF'
+CUR_DIR := $(shell pwd)
+run_filelist_gen := $(shell bash $(CUR_DIR)/hw/filelist/filelist_gen.sh)
+
+filelist_gen:
+@echo $(run_filelist_gen) 
+EOF
+
+sed -i "s/@echo/\t@echo/g" $ROOT_DIR/Makefile
+
+endsnippet
+
 # vim:ft=snippets:
