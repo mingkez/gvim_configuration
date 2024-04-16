@@ -5,7 +5,7 @@ FILE_DIR := $(CUR_DIR)/../hw/filelist
 all:clean com run verdi
 
 com:
-	vcs -full64 -debug_acc+all -debug_region+cell+encrypt  -fsdb -sverilog -f $(FILE_DIR)/$1.f -top $2 
+	vcs -full64 -debug_acc+all -debug_region+cell+encrypt -timescale=1ns/1ps  -fsdb -sverilog -f $(FILE_DIR)/$1.f -top $2 
 
 run:
 	./simv -l run.log 
